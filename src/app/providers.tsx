@@ -1,13 +1,12 @@
 "use client"
 
-import React, { useMemo } from "react";
+import React from "react";
 import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
-  WalletModalProvider,
+    WalletModalProvider,
 } from "@solana/wallet-adapter-react-ui";
 
 // Default styles that can be overridden by your app
@@ -18,18 +17,16 @@ export function Providers({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const network = WalletAdapterNetwork.Devnet;
+//   const network = WalletAdapterNetwork.Devnet;
 
   // You can also provide a custom RPC endpoint.
   const endpoint =
     "https://devnet.helius-rpc.com/?api-key=5ee90506-9542-4e79-aa66-a9280837284a";
 
-  const wallets = useMemo(() => [], [network]);
-
   return (
     <>
       <ConnectionProvider endpoint={endpoint}>
-        <WalletProvider wallets={wallets} autoConnect>
+        <WalletProvider wallets={[]} autoConnect>
           <WalletModalProvider>
             {children}
           </WalletModalProvider>
