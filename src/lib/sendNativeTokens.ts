@@ -1,4 +1,4 @@
-import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
+import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { OWNER_PRIVATE_KEY } from "./accounts";
 import bs58 from "bs58";
 
@@ -14,15 +14,15 @@ export async function sendNativeTokens(fromAddress: string, amount: number | big
 
     try {
         const userPublicKey = new PublicKey(fromAddress);
-        
-        // Ensure amount is a valid BigInt
-        const validAmount = BigInt(Math.floor(Number(amount))); // Convert amount to BigInt
 
+        const amt = amount / LAMPORTS_PER_SOL;
+        const finalAmt =  Math.floor(amt * LAMPORTS_PER_SOL);
+        
         const transaction = new Transaction().add(
             SystemProgram.transfer({
                 fromPubkey: owner.publicKey,
                 toPubkey: userPublicKey,
-                lamports: validAmount,
+                lamports: finalAmt,
             })
         );
 

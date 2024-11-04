@@ -1,9 +1,9 @@
 import { burn, getAssociatedTokenAddress, TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
-import { Connection, Keypair, PublicKey } from "@solana/web3.js";
+import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { OWNER_PRIVATE_KEY, TOKEN_MINT } from "./accounts";
 import bs58 from "bs58";
 
-export async function burnTokens(amount: number | bigint) {
+export async function burnTokens(amount: number) {
     const connection = new Connection("https://devnet.helius-rpc.com/?api-key=5ee90506-9542-4e79-aa66-a9280837284a", {
         commitment: "confirmed",
     });
@@ -22,10 +22,11 @@ export async function burnTokens(amount: number | bigint) {
 
     console.log("Owner token account: ", ownerTokenAccount.toBase58());
 
-    try {
-        // Ensure amount is a valid BigInt
-        const validAmount = BigInt(Math.floor(Number(amount))); // Convert amount to BigInt
+    const amt = amount / LAMPORTS_PER_SOL;
+    const finalAmt =  Math.floor(amt * LAMPORTS_PER_SOL);
 
+    try {
+        
         // Attempt to burn tokens
         const burning = await burn(
             connection,
@@ -33,7 +34,7 @@ export async function burnTokens(amount: number | bigint) {
             ownerTokenAccount,
             mint,
             owner.publicKey,
-            validAmount,
+            finalAmt,
             [],
             undefined,
             TOKEN_2022_PROGRAM_ID

@@ -12,31 +12,40 @@ export async function POST(req: NextRequest) {
     const amount = Number(data.amount);
     const type = "received_native_sol";
 
-    const apy = Number(await getApy());
+    const apy = await getApy(amount);
+    const apyValue = apy.apy;
+    const earnedAmount = apy.earnedAmount;
 
-    if (type === "received_native_sol") {
-        console.log(apy * amount);
-        const newAmount = (apy * amount) + amount;  
-        console.log("New amount: ", newAmount);
+    if (type === "received_nativee_sol") {
+
+        const newAmount = amount - earnedAmount;
+        console.log("newAmount: ", newAmount);
 
         const data = await mintTokens(fromAddress, newAmount);
         return NextResponse.json({
             message: "ok",
-            data
+            data,
+            apy,
+            sol: amount,
+            token: newAmount
         })
     } else {
         console.log("Burning tokens for", fromAddress);
         const burn = await burnTokens(amount);
 
         console.log("Sending native tokens to", fromAddress);
-        const newAmount = amount + (apy * amount);
+        
+        const newAmount = amount + earnedAmount;
         console.log("New amount: ", newAmount);
         const send = await sendNativeTokens(fromAddress, newAmount); // send native tokens like SOL
 
         return await NextResponse.json({
             message: "ok",
             burn,
-            send
+            send,
+            apy,
+            sol: newAmount,
+            token: amount
         })
     }
 }
