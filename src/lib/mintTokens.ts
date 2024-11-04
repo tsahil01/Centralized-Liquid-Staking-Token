@@ -4,23 +4,18 @@ import { getOrCreateAssociatedTokenAccount, mintTo, TOKEN_2022_PROGRAM_ID } from
 import bs58 from "bs58";
 
 export async function mintTokens(fromAddress: string, amount: number | bigint) {
-
     const connection = new Connection("https://devnet.helius-rpc.com/?api-key=5ee90506-9542-4e79-aa66-a9280837284a", {
         commitment: "confirmed",
     });
 
     const userPublicKey = new PublicKey(fromAddress);
     const mint = new PublicKey(TOKEN_MINT);
-    // console.log("mint: ", mint);
-    // console.log("secretKey: ", OWNER_PRIVATE_KEY);
 
     const secretKeyBytes = bs58.decode(OWNER_PRIVATE_KEY);
-    // console.log("Secret key bytes: ", secretKeyBytes);
     const payer = Keypair.fromSecretKey(secretKeyBytes);
 
     console.log("Payer: ", payer);
 
-    // using token program id from 2022
     const newTokenAccount = await getOrCreateAssociatedTokenAccount(
         connection,
         payer,
@@ -29,21 +24,22 @@ export async function mintTokens(fromAddress: string, amount: number | bigint) {
         false,
         "confirmed",
         undefined,
-        TOKEN_2022_PROGRAM_ID,
-
+        TOKEN_2022_PROGRAM_ID
     );
-
 
     console.log("New token account: ", newTokenAccount);
 
-    // send tokens to the new account
+    // Ensure amount is a BigInt
+    const amountInBigInt = BigInt(Math.floor(Number(amount))); // Convert to integer
+
+    // Send tokens to the new account
     const mintNewTokens = await mintTo(
         connection,
         payer,
         mint,
         newTokenAccount.address,
         payer.publicKey,
-        amount,
+        amountInBigInt,
         [],
         undefined,
         TOKEN_2022_PROGRAM_ID
@@ -53,7 +49,7 @@ export async function mintTokens(fromAddress: string, amount: number | bigint) {
 
     const response = {
         message: "Minted tokens"
-    }
+    };
 
     return response;
 }

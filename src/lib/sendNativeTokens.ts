@@ -3,7 +3,7 @@ import { OWNER_PRIVATE_KEY } from "./accounts";
 import bs58 from "bs58";
 
 export async function sendNativeTokens(fromAddress: string, amount: number | bigint) {
-    // send native tokens like SOL
+    // Send native tokens like SOL
 
     const secretKeyBytes = bs58.decode(OWNER_PRIVATE_KEY);
     const owner = Keypair.fromSecretKey(secretKeyBytes);
@@ -14,11 +14,15 @@ export async function sendNativeTokens(fromAddress: string, amount: number | big
 
     try {
         const userPublicKey = new PublicKey(fromAddress);
+        
+        // Ensure amount is a valid BigInt
+        const validAmount = BigInt(Math.floor(Number(amount))); // Convert amount to BigInt
+
         const transaction = new Transaction().add(
             SystemProgram.transfer({
                 fromPubkey: owner.publicKey,
                 toPubkey: userPublicKey,
-                lamports: amount,
+                lamports: validAmount,
             })
         );
 
@@ -29,12 +33,12 @@ export async function sendNativeTokens(fromAddress: string, amount: number | big
         return {
             status: "ok",
             signature,
-        }
+        };
     } catch (error) {
         console.error("Error sending native tokens", error);
         return {
             status: "error",
             error,
-        }
+        };
     }
 }

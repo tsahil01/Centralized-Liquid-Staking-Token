@@ -18,34 +18,37 @@ export async function burnTokens(amount: number | bigint) {
         owner.publicKey,
         false,
         TOKEN_2022_PROGRAM_ID
-    )
+    );
 
     console.log("Owner token account: ", ownerTokenAccount.toBase58());
 
     try {
+        // Ensure amount is a valid BigInt
+        const validAmount = BigInt(Math.floor(Number(amount))); // Convert amount to BigInt
+
         // Attempt to burn tokens
-        const buring = await burn(
+        const burning = await burn(
             connection,
             owner,
             ownerTokenAccount,
             mint,
             owner.publicKey,
-            amount,
+            validAmount,
             [],
             undefined,
             TOKEN_2022_PROGRAM_ID
         );
 
-        console.log("Burned: ", buring);
+        console.log("Burned: ", burning);
         return {
             success: true,
             message: "Tokens burned successfully",
-        }
+        };
     } catch (error) {
         console.error("Error burning tokens: ", error);
         return {
             success: false,
             message: "Error burning tokens",
-        }
+        };
     }
 }

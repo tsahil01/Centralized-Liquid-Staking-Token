@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { ArrowDownUp, ArrowRight, Coins } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [tokenAmount, setTokenAmount] = useState(0);
@@ -22,6 +22,17 @@ export default function Home() {
   const [nativeAmount, setNativeAmount] = useState(0);
   const [nativeValue, setNativeValue] = useState(0); // in USD
   const [nativeType, setNativeType] = useState("SOL");
+  const [apy, setApy] = useState(0);
+
+  useEffect(() => {
+    async function fetchApy() {
+      const response = await fetch("/api/apy");
+      const data = await response.json();
+      setApy(data.apy);
+    }
+
+    fetchApy();
+  }, [])
 
   const [up, setUp] = useState(tokenType);
 
