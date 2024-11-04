@@ -21,7 +21,7 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
-import { ArrowDownUp, ArrowRight, Coins } from "lucide-react";
+import { ArrowDownUp, ArrowRight, CloudLightningIcon, Coins } from "lucide-react";
 import { useEffect, useState } from "react";
 import { OWNER_PUBLIC_KEY, TOKEN_MINT } from "@/lib/accounts";
 import {
@@ -190,7 +190,6 @@ export default function Home() {
           }
           const data = await response.json();
           console.log("Webhook response: ", data);
-          
         } catch (error) {
           console.error("Failed to stake tokens:", error);
           toast({
@@ -204,132 +203,142 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex flex-col gap-5 justify-center items-center min-h-screen w-full mx-auto p-5">
-        <div className="flex flex-row gap-4 w-auto">
-          <WalletMultiButton />
-          <Button
-            className="mx-auto rounded-full my-auto"
-            size={"lg"}
-            variant={"link"}
-            onClick={() => {
-              fetchApy(LAMPORTS_PER_SOL);
-            }}
-          >
-            Refetch APY
-          </Button>
+      <div className="flex flex-col gap-5 justify-center items-center min-h-screen w-full mx-auto gap-7 p-5">
+        <div className="flex flex-row gap-8 w-auto">
+          <WalletMultiButton style={{ borderRadius: "1000px" }} />
         </div>
 
-        <Card className="p-6 rounded-lg shadow-lg ">
-          <CardHeader>
-            <CardTitle className="text-4xl font-bold ">Stake Tokens</CardTitle>
-            <CardDescription>
-              {"Stake your tokens to earn rewards"}
-            </CardDescription>
-          </CardHeader>
+        <div className="relative flex justify-center gap-6 mx-auto">
+          <div className="absolute bottom-0 translate-y-1/2 bg-black border font-bold py-1 px-3 rounded-full text-sm">
+            Solana Devnet
+          </div>
 
-          <CardContent className="my-4">
-            <div className="flex flex-col gap-6 mx-auto">
-              <div className="rounded-xl border flex flex-col gap-6 p-4 bg-primary/10">
-                <p className="font-bold">{"You're Selling"}</p>
-
-                <div className="flex flex-row gap-2 justify-between">
-                  <div className="rounded-xl bg-primary/20 border px-5 py-2 font-bold flex flex-row my-auto gap-2">
-                    {up === tokenType ? (
-                      <Coins className="w-6 h-6 mr-2" />
-                    ) : (
-                      <SimpleIconsSolana className="my-auto mr-2" />
-                    )}
-                    <p className="my-auto">
-                      {up === tokenType ? tokenType : nativeType}
-                    </p>
-                  </div>
-
-                  <div className="px-5 py-2 font-bold flex flex-col my-auto justify-end border-0">
-                    <Input
-                      className="text-right text-3xl border-0 ring-0 bg-none shadow-none focus:border-0 focus:ring-0 focus:bg-none focus:shadow-none"
-                      value={up === tokenType ? tokenAmount : nativeAmount}
-                      disabled={fetching}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        const isValidNumber = /^\d*\.?\d{0,2}$/.test(value);
-                        if (isValidNumber) {
-                          const parsedValue = parseFloat(value) || 0;
-
-                          if (up === tokenType) {
-                            setTokenAmount(parsedValue);
-                            setNativeAmount(
-                              (LAMPORTS_PER_SOL * parsedValue +
-                                parsedValue * apy.earnedAmount) /
-                                LAMPORTS_PER_SOL
-                            );
-                          } else {
-                            setNativeAmount(parsedValue);
-                            setTokenAmount(
-                              (parsedValue * LAMPORTS_PER_SOL -
-                                parsedValue * apy.earnedAmount) /
-                                LAMPORTS_PER_SOL
-                            );
-                          }
-                        }
-                      }}
-                    />
-                    {(up === tokenType ? tokenAmount : nativeAmount) > 0 && (
-                      <p className="text-sm text-primary/40 text-right">
-                        {`$ ${up === tokenType ? tokenValue : nativeValue}`}
-                      </p>
-                    )}
-                  </div>
-                </div>
+          <Card className="p-6 rounded-lg shadow-lg ">
+            <CardHeader className="flex flex-row justify-between">
+              <div className="w-full">
+                <CardTitle className="text-4xl font-bold ">
+                  Stake Tokens
+                </CardTitle>
+                <CardDescription>
+                  {"Stake your tokens to earn rewards"}
+                </CardDescription>
               </div>
-
               <Button
-                className="mx-auto rounded-full"
-                size={"lg"}
-                variant={"outline"}
-                onClick={handleSwap}
+                className="mx-auto rounded-full my-auto"
+                size={"sm"}
+                variant={"link"}
+                onClick={() => {
+                  fetchApy(LAMPORTS_PER_SOL);
+                }}
               >
-                <ArrowDownUp className="w-9 h-9 font-bold " />
+                Refetch APY
               </Button>
+            </CardHeader>
 
-              <div className="rounded-xl border flex flex-col gap-6 p-4 bg-primary/10">
-                <p className="font-bold">{"You're Receiving"}</p>
+            <CardContent className="my-4">
+              <div className="flex flex-col gap-6 mx-auto">
+                <div className="rounded-xl border flex flex-col gap-6 p-4 bg-primary/10">
+                  <p className="font-bold">{"You're Selling"}</p>
 
-                <div className="flex flex-row gap-2 justify-between">
-                  <div className="rounded-xl bg-primary/20 border px-5 py-2 font-bold flex flex-row my-auto gap-2">
-                    {up === tokenType ? (
-                      <SimpleIconsSolana className="my-auto mr-2" />
-                    ) : (
-                      <Coins className="w-6 h-6 mr-2" />
-                    )}
-                    {up === tokenType ? nativeType : tokenType}
-                  </div>
-
-                  <div className="px-5 py-2 font-bold flex flex-col my-auto justify-end">
-                    <p className="text-3xl text-right">
-                      {up === tokenType ? nativeAmount : tokenAmount}
-                    </p>
-                    {(up === tokenType ? nativeAmount : tokenAmount) > 0 && (
-                      <p className="text-sm text-primary/40 text-right">
-                        {`$ ${up === tokenType ? nativeValue : tokenValue}`}
+                  <div className="flex flex-row gap-2 justify-between">
+                    <div className="rounded-xl bg-primary/20 border px-5 py-2 font-bold flex flex-row my-auto gap-2">
+                      {up === tokenType ? (
+                        <Coins className="w-6 h-6 mr-2" />
+                      ) : (
+                        <SimpleIconsSolana className="my-auto mr-2" />
+                      )}
+                      <p className="my-auto">
+                        {up === tokenType ? tokenType : nativeType}
                       </p>
-                    )}
+                    </div>
+
+                    <div className="px-5 py-2 font-bold flex flex-col my-auto justify-end border-0">
+                      <Input
+                        className="text-right text-3xl border-0 ring-0 bg-none shadow-none focus:border-0 focus:ring-0 focus:bg-none focus:shadow-none"
+                        value={up === tokenType ? tokenAmount : nativeAmount}
+                        disabled={fetching}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const isValidNumber = /^\d*\.?\d{0,2}$/.test(value);
+                          if (isValidNumber) {
+                            const parsedValue = parseFloat(value) || 0;
+
+                            if (up === tokenType) {
+                              setTokenAmount(parsedValue);
+                              setNativeAmount(
+                                (LAMPORTS_PER_SOL * parsedValue +
+                                  parsedValue * apy.earnedAmount) /
+                                  LAMPORTS_PER_SOL
+                              );
+                            } else {
+                              setNativeAmount(parsedValue);
+                              setTokenAmount(
+                                (parsedValue * LAMPORTS_PER_SOL -
+                                  parsedValue * apy.earnedAmount) /
+                                  LAMPORTS_PER_SOL
+                              );
+                            }
+                          }
+                        }}
+                      />
+                      {(up === tokenType ? tokenAmount : nativeAmount) > 0 && (
+                        <p className="text-sm text-primary/40 text-right">
+                          {`$ ${up === tokenType ? tokenValue : nativeValue}`}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  className="mx-auto rounded-full"
+                  size={"lg"}
+                  variant={"outline"}
+                  onClick={handleSwap}
+                >
+                  <ArrowDownUp className="w-9 h-9 font-bold " />
+                </Button>
+
+                <div className="rounded-xl border flex flex-col gap-6 p-4 bg-primary/10">
+                  <p className="font-bold">{"You're Receiving"}</p>
+
+                  <div className="flex flex-row gap-2 justify-between">
+                    <div className="rounded-xl bg-primary/20 border px-5 py-2 font-bold flex flex-row my-auto gap-2">
+                      {up === tokenType ? (
+                        <SimpleIconsSolana className="my-auto mr-2" />
+                      ) : (
+                        <Coins className="w-6 h-6 mr-2" />
+                      )}
+                      {up === tokenType ? nativeType : tokenType}
+                    </div>
+
+                    <div className="px-5 py-2 font-bold flex flex-col my-auto justify-end">
+                      <p className="text-3xl text-right">
+                        {up === tokenType ? nativeAmount : tokenAmount}
+                      </p>
+                      {(up === tokenType ? nativeAmount : tokenAmount) > 0 && (
+                        <p className="text-sm text-primary/40 text-right">
+                          {`$ ${up === tokenType ? nativeValue : tokenValue}`}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-center">
-            <Button
-              className=""
-              size={"lg"}
-              variant={"default"}
-              onClick={stakeNow}
-            >
-              <p className="font-bold">{"Stake"}</p>
-              <ArrowRight className="w-9 h-9 ml-2" />
-            </Button>
-          </CardFooter>
-        </Card>
+            </CardContent>
+            <CardFooter className="flex justify-center">
+              <Button
+                className=""
+                size={"lg"}
+                variant={"default"}
+                onClick={stakeNow}
+              >
+                <p className="font-bold">{"Stake"}</p>
+                <ArrowRight className="w-9 h-9 ml-2" />
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
     </>
   );
