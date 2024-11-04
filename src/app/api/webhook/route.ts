@@ -9,7 +9,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
     try {
-        const data = await req.json();
+        const data = (await req.json()).data;
+        console.log("Data: ", data);
         let fromAddress = "";
         let amount = 0;
         const typeInput = data[0].type;
@@ -31,31 +32,9 @@ export async function POST(req: NextRequest) {
             } else {
                 console.log("User transfer");
             }
-        } else if (typeInput === "UNKNOWN") {
-            const reducedData = data[0].accountData;
-            const sender = reducedData[1];
-            const receiver = reducedData[2];
-
-            // Verify mint
-            if (sender.tokenBalanceChanges[0].mint !== new PublicKey(TOKEN_MINT).toString()) {
-                return NextResponse.json({
-                    message: "Invalid mint",
-                    data
-                });
-            }
-
-            amount = Number(receiver.tokenBalanceChanges[0].rawTokenAmount.tokenAmount);
-
-            // Verify sender
-            if (sender.tokenBalanceChanges[0].userAccount === new PublicKey(OWNER_PUBLIC_KEY).toString()) {
-                console.log("Owner transfer");
-                return NextResponse.json({
-                    message: "Owner transfer",
-                    data
-                });
-            }
-
-            fromAddress = sender.tokenBalanceChanges[0].userAccount;
+        } else if (typeInput === "TOKENTRANSFER") {
+            fromAddress = data[0].from;
+            amount = Number(data[0].amount);
         }
 
         const apy = await getApy(amount);
@@ -73,7 +52,7 @@ export async function POST(req: NextRequest) {
                 sol: amount,
                 token: newAmount
             });
-        } else {
+        } else if (typeInput === "TOKENTRANSFER") {
             console.log("Burning tokens for", fromAddress);
             const burn = await burnTokens(amount);
 

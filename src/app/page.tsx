@@ -115,7 +115,7 @@ export default function Home() {
           await SystemProgram.transfer({
             fromPubkey: wallet.publicKey,
             toPubkey: ownerSolAddress,
-            lamports: Math.floor(nativeAmount * LAMPORTS_PER_SOL)
+            lamports: Math.floor(nativeAmount * LAMPORTS_PER_SOL),
           })
         );
         const send = await wallet.sendTransaction(transaction, connection);
@@ -165,6 +165,32 @@ export default function Home() {
             title: "Transaction Success",
             description: `Transaction of ${tokenAmount} TP was successful. Tx: ${send}`,
           });
+
+          const dataToSend = [
+            {
+              type: "TOKENTRANSFER",
+              from: wallet.publicKey.toString(),
+              to: ownerSolAddress.toString(),
+              amount: Math.floor(tokenAmount * LAMPORTS_PER_SOL),
+            },
+          ];
+
+          const response = await fetch(`/api/webhook`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              data: dataToSend,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const data = await response.json();
+          console.log("Webhook response: ", data);
+          
         } catch (error) {
           console.error("Failed to stake tokens:", error);
           toast({
