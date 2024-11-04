@@ -32,9 +32,10 @@ export async function POST(req: NextRequest) {
             } else {
                 console.log("User transfer");
             }
-        } else if (typeInput === "TOKENTRANSFER") {
-            fromAddress = data[0].from;
-            amount = Number(data[0].amount);
+        } else if (data.data[0].type === "TOKENTRANSFER") {
+
+            fromAddress = data.data[0].from;
+            amount = Number(data.data[0].amount);
         }
 
         const apy = await getApy(amount);
