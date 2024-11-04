@@ -186,9 +186,7 @@ export default function Home() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-              data: dataToSend,
-            }),
+            body: JSON.stringify(dataToSend),
           });
 
           if (!response.ok) {

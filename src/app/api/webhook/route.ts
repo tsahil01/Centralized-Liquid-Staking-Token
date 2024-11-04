@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
     try {
-        const data = (await req.json()).data;
+        const data = (await req.json());
         console.log("Data: ", data);
         let fromAddress = "";
         let amount = 0;
