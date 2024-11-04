@@ -2,7 +2,7 @@ import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from "@sol
 import { OWNER_PRIVATE_KEY } from "./accounts";
 import bs58 from "bs58";
 
-export async function sendNativeTokens(fromAddress: string, amount: string) {
+export async function sendNativeTokens(fromAddress: string, amount: number | bigint) {
     // send native tokens like SOL
 
     const secretKeyBytes = bs58.decode(OWNER_PRIVATE_KEY);
@@ -18,7 +18,7 @@ export async function sendNativeTokens(fromAddress: string, amount: string) {
             SystemProgram.transfer({
                 fromPubkey: owner.publicKey,
                 toPubkey: userPublicKey,
-                lamports: parseInt(amount),
+                lamports: amount,
             })
         );
 

@@ -1,6 +1,7 @@
-import { burnTokens } from "@/app/lib/burnTokens";
-import { mintTokens } from "@/app/lib/mintTokens";
-import { sendNativeTokens } from "@/app/lib/sendNativeTokens";
+import { burnTokens } from "@/lib/burnTokens";
+import { getApy } from "@/lib/maths";
+import { mintTokens } from "@/lib/mintTokens";
+import { sendNativeTokens } from "@/lib/sendNativeTokens";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -8,11 +9,16 @@ export async function POST(req: NextRequest) {
 
     const fromAddress = data.fromAddress;
     const toAddress = data.toAddress;
-    const amount = data.amount;
-    const type = "received_nativwe_sol";
+    const amount = BigInt(data.amount);
+    const type = "received_native_sol";
+
+    const apy = await getApy();
 
     if (type === "received_native_sol") {
-        const data = await mintTokens(fromAddress, amount);
+
+        const newAmount = amount + BigInt(apy) * amount;
+
+        const data = await mintTokens(fromAddress, newAmount);
         return NextResponse.json({
             message: "ok",
             data
@@ -20,9 +26,10 @@ export async function POST(req: NextRequest) {
     } else {
         console.log("Burning tokens for", fromAddress);
         const burn = await burnTokens(amount);
-        
+
         console.log("Sending native tokens to", fromAddress);
-        const send = await sendNativeTokens(fromAddress, amount); // send native tokens like SOL
+        const newAmount = amount - BigInt(apy) * amount;
+        const send = await sendNativeTokens(fromAddress, newAmount); // send native tokens like SOL
 
         return await NextResponse.json({
             message: "ok",

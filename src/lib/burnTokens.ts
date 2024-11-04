@@ -3,7 +3,7 @@ import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { OWNER_PRIVATE_KEY, TOKEN_MINT } from "./accounts";
 import bs58 from "bs58";
 
-export async function burnTokens(amount: string) {
+export async function burnTokens(amount: number | bigint) {
     const connection = new Connection("https://devnet.helius-rpc.com/?api-key=5ee90506-9542-4e79-aa66-a9280837284a", {
         commitment: "confirmed",
     });
@@ -30,7 +30,7 @@ export async function burnTokens(amount: string) {
             ownerTokenAccount,
             mint,
             owner.publicKey,
-            parseInt(amount),
+            amount,
             [],
             undefined,
             TOKEN_2022_PROGRAM_ID
