@@ -21,7 +21,13 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
-import { ArrowDownUp, ArrowRight, CloudLightningIcon, Coins } from "lucide-react";
+import {
+  ArrowDownUp,
+  ArrowRight,
+  CloudLightningIcon,
+  Coins,
+  GithubIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { OWNER_PUBLIC_KEY, TOKEN_MINT } from "@/lib/accounts";
 import {
@@ -203,13 +209,13 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex flex-col gap-5 justify-center items-center min-h-screen w-full mx-auto gap-7 p-5">
+      <div className="flex flex-col justify-center items-center min-h-screen w-full mx-auto gap-7 p-5">
         <div className="flex flex-row gap-8 w-auto">
           <WalletMultiButton style={{ borderRadius: "1000px" }} />
         </div>
 
         <div className="relative flex justify-center gap-6 mx-auto">
-          <div className="absolute bottom-0 translate-y-1/2 bg-black border font-bold py-1 px-3 rounded-full text-sm">
+          <div className="absolute bottom-0 translate-y-1/2 bg-black border font-bold py-1 px-3 rounded-full text-xs">
             Solana Devnet
           </div>
 
@@ -339,6 +345,17 @@ export default function Home() {
             </CardFooter>
           </Card>
         </div>
+        <Button
+          className="w-full"
+          variant={"link"}
+          size={"sm"}
+          onClick={() => {
+            window.open(
+              "https://github.com/tsahil01/Centralized-Liquid-Staking-Token"
+            );
+          }}
+        >Code on GitHub
+        </Button>
       </div>
     </>
   );
