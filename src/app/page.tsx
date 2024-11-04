@@ -309,7 +309,7 @@ export default function Home() {
   );
 }
 
-export function SimpleIconsSolana(props: SVGProps<SVGSVGElement>) {
+function SimpleIconsSolana(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

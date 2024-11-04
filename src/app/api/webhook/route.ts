@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
     const apy = await getApy(amount);
     const earnedAmount = apy.earnedAmount;
 
+    // @ts-ignore
     if (typeInput == `received_native_sol`) {
 
         const newAmount = amount - earnedAmount;
