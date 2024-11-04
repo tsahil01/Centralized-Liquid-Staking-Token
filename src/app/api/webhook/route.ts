@@ -1,52 +1,102 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { OWNER_PUBLIC_KEY, TOKEN_MINT } from "@/lib/accounts";
 import { burnTokens } from "@/lib/burnTokens";
 import { getApy } from "@/lib/maths";
 import { mintTokens } from "@/lib/mintTokens";
 import { sendNativeTokens } from "@/lib/sendNativeTokens";
+import { PublicKey } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-    const data = await req.json();
+    try {
+        const data = await req.json();
+        let fromAddress = "";
+        let amount = 0;
+        const typeInput = data[0].type;
+        console.log("Type: ", typeInput);
 
-    const fromAddress = data.fromAddress;
-    const toAddress = data.toAddress;
-    const amount = Number(data.amount);
-    const typeInput = ``;
+        if (typeInput === "TRANSFER") {
+            amount = Number(data[0].nativeTransfers[0].amount);
+            console.log("Amount: ", amount);
 
-    const apy = await getApy(amount);
-    const earnedAmount = apy.earnedAmount;
+            fromAddress = data[0].nativeTransfers[0].fromUserAccount;
+            console.log("From: ", fromAddress);
 
-    // @ts-ignore
-    if (typeInput == `received_native_sol`) {
+            if (fromAddress === new PublicKey(OWNER_PUBLIC_KEY).toString()) {
+                console.log("Owner transfer");
+                return NextResponse.json({
+                    message: "Owner transfer",
+                    data
+                });
+            } else {
+                console.log("User transfer");
+            }
+        } else if (typeInput === "UNKNOWN") {
+            const reducedData = data[0].accountData;
+            const sender = reducedData[1];
+            const receiver = reducedData[2];
 
-        const newAmount = amount - earnedAmount;
-        console.log("newAmount: ", newAmount);
+            // Verify mint
+            if (sender.tokenBalanceChanges[0].mint !== new PublicKey(TOKEN_MINT).toString()) {
+                return NextResponse.json({
+                    message: "Invalid mint",
+                    data
+                });
+            }
 
-        const data = await mintTokens(fromAddress, newAmount);
+            amount = Number(receiver.tokenBalanceChanges[0].rawTokenAmount.tokenAmount);
+
+            // Verify sender
+            if (sender.tokenBalanceChanges[0].userAccount === new PublicKey(OWNER_PUBLIC_KEY).toString()) {
+                console.log("Owner transfer");
+                return NextResponse.json({
+                    message: "Owner transfer",
+                    data
+                });
+            }
+
+            fromAddress = sender.tokenBalanceChanges[0].userAccount;
+        }
+
+        const apy = await getApy(amount);
+        const earnedAmount = apy.earnedAmount;
+
+        if (typeInput === "TRANSFER") {
+            const newAmount = amount - earnedAmount;
+            console.log("newAmount: ", newAmount);
+
+            const mintData = await mintTokens(fromAddress, newAmount);
+            return NextResponse.json({
+                message: "ok",
+                data: mintData,
+                apy,
+                sol: amount,
+                token: newAmount
+            });
+        } else {
+            console.log("Burning tokens for", fromAddress);
+            const burn = await burnTokens(amount);
+
+            console.log("Sending native tokens to", fromAddress);
+
+            const newAmount = amount + earnedAmount;
+            console.log("New amount: ", newAmount);
+            const send = await sendNativeTokens(fromAddress, newAmount);
+
+            return NextResponse.json({
+                message: "ok",
+                burn,
+                send,
+                apy,
+                sol: newAmount,
+                token: amount
+            });
+        }
+    } catch (error) {
+        console.error("Error processing request:", error);
         return NextResponse.json({
-            message: "ok",
-            data,
-            apy,
-            sol: amount,
-            token: newAmount
-        })
-    } else {
-        console.log("Burning tokens for", fromAddress);
-        const burn = await burnTokens(amount);
-
-        console.log("Sending native tokens to", fromAddress);
-        
-        const newAmount = amount + earnedAmount;
-        console.log("New amount: ", newAmount);
-        const send = await sendNativeTokens(fromAddress, newAmount); // send native tokens like SOL
-
-        return await NextResponse.json({
-            message: "ok",
-            burn,
-            send,
-            apy,
-            sol: newAmount,
-            token: amount
-        })
+            message: "An error occurred",
+            error: error
+        });
     }
 }
