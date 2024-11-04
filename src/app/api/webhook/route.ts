@@ -32,10 +32,12 @@ export async function POST(req: NextRequest) {
             } else {
                 console.log("User transfer");
             }
-        } else if (data.data[0].type === "TOKENTRANSFER") {
+        } else if (data[0].type == "TOKENTRANSFER") {
 
-            fromAddress = data.data[0].from;
-            amount = Number(data.data[0].amount);
+            fromAddress = data[0].from;
+            console.log("From: ", fromAddress);
+            amount = Number(data[0].amount);
+            console.log("Amount: ", amount);
         }
 
         const apy = await getApy(amount);
