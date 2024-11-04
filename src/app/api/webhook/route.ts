@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { burnTokens } from "@/lib/burnTokens";
 import { getApy } from "@/lib/maths";
 import { mintTokens } from "@/lib/mintTokens";
@@ -10,13 +11,12 @@ export async function POST(req: NextRequest) {
     const fromAddress = data.fromAddress;
     const toAddress = data.toAddress;
     const amount = Number(data.amount);
-    const type = "received_native_sol";
+    const typeInput = ``;
 
     const apy = await getApy(amount);
-    const apyValue = apy.apy;
     const earnedAmount = apy.earnedAmount;
 
-    if (type === "received_nativee_sol") {
+    if (typeInput == `received_native_sol`) {
 
         const newAmount = amount - earnedAmount;
         console.log("newAmount: ", newAmount);

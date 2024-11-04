@@ -17,11 +17,8 @@ export function Providers({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-//   const network = WalletAdapterNetwork.Devnet;
 
-  // You can also provide a custom RPC endpoint.
-  const endpoint =
-    "https://devnet.helius-rpc.com/?api-key=5ee90506-9542-4e79-aa66-a9280837284a";
+  const endpoint = "https://api.devnet.solana.com";
 
   return (
     <>
