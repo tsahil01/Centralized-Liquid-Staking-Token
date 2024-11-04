@@ -10,7 +10,8 @@ interface ApyResult {
 }
 
 export async function getApy(investedAmount: number = 1): Promise<ApyResult> {
-    const connection = new Connection("https://devnet.helius-rpc.com/?api-key=5ee90506-9542-4e79-aa66-a9280837284a", {
+    const endpoint = process.env.NEXT_PUBLIC_RPC_URL || "";
+    const connection = new Connection(endpoint, {
         commitment: "confirmed",
     });
     const mint = new PublicKey(TOKEN_MINT);

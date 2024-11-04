@@ -18,7 +18,7 @@ export function Providers({
   children: React.ReactNode;
 }>) {
 
-  const endpoint = "https://api.devnet.solana.com";
+  const endpoint = process.env.NEXT_PUBLIC_RPC_URL || "https://api.devnet.solana.com";
 
   return (
     <>

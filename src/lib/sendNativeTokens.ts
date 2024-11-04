@@ -7,8 +7,9 @@ export async function sendNativeTokens(fromAddress: string, amount: number) {
 
     const secretKeyBytes = bs58.decode(OWNER_PRIVATE_KEY);
     const owner = Keypair.fromSecretKey(secretKeyBytes);
+    const endpoint = process.env.NEXT_PUBLIC_RPC_URL || "";
 
-    const connection = new Connection("https://devnet.helius-rpc.com/?api-key=5ee90506-9542-4e79-aa66-a9280837284a", {
+    const connection = new Connection(endpoint, {
         commitment: "confirmed",
     });
 

@@ -4,7 +4,8 @@ import { OWNER_PRIVATE_KEY, TOKEN_MINT } from "./accounts";
 import bs58 from "bs58";
 
 export async function burnTokens(amount: number) {
-    const connection = new Connection("https://devnet.helius-rpc.com/?api-key=5ee90506-9542-4e79-aa66-a9280837284a", {
+    const endpoint = process.env.NEXT_PUBLIC_RPC_URL || "";
+    const connection = new Connection(endpoint, {
         commitment: "confirmed",
     });
 
